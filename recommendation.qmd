@@ -1,0 +1,74 @@
+---
+title: "recommendation"
+format: html
+editor: visual
+---
+
+```{r loading libraries}
+library(tidyverse)
+library(janitor)
+```
+
+
+```{r Loading files}
+url = "http://www2.informatik.uni-freiburg.de/~cziegler/BX/BX-CSV-Dump.zip"
+download.file(url, destfile = "data.zip")
+dir.create("data")
+unzip("data.zip",exdir = "data")   
+
+files = paste0("data/",list.files("data"))
+
+ratings = read.csv(files[1], sep = ";") %>% 
+  clean_names()
+books = read.csv(files[2], sep = ";") %>% 
+  clean_names()
+users = read.csv(files[3], sep = ";") %>% 
+  clean_names()
+
+rm(files, url)
+```
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
