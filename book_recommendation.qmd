@@ -12,10 +12,10 @@ library(janitor)
 ## Loading and Cleaning Data
 
 ```{r Loading files}
-url = "http://www2.informatik.uni-freiburg.de/~cziegler/BX/BX-CSV-Dump.zip"
-download.file(url, destfile = "data.zip")
-dir.create("data")
-unzip("data.zip",exdir = "data")   
+# url = "http://www2.informatik.uni-freiburg.de/~cziegler/BX/BX-CSV-Dump.zip"
+# download.file(url, destfile = "data.zip")
+# dir.create("data")
+# unzip("data.zip",exdir = "data")   
 
 files = paste0("data/",list.files("data"))
 
@@ -26,7 +26,8 @@ books = read.csv(files[2], sep = ";") %>%
 users = read.csv(files[3], sep = ";") %>% 
   clean_names()
 
-rm(files, url)
+# rm(files, url)
+rm(files)
 ```
 
 
@@ -119,17 +120,17 @@ books_distance <- books %>%
 
 
 ```{r}
-book_feature <- books[1:10000,c("book_author","publisher","category")]
+book_feature <- books[1:1000,c("book_author","publisher","category")]
 
 book_feature[,1] <- as.factor(book_feature[,1])
 book_feature[,2] <- as.factor(book_feature[,2])
 book_feature[,3] <- as.factor(book_feature[,3])
 
 dissimilarity = daisy(book_feature, metric = "gower", weights = c(2,0.5,1))
-dissimilarity2 = as.table(dissimilarity)
+dissimilarity = as.matrix(dissimilarity)
 
-row.names(dissimilarity2)<-  books$ISBN[1:10000]
-colnames(dissimilarity2)<- books$ISBN[1:10000]
+rownames(dissimilarity) <-  books$isbn[1:1000]
+colnames(dissimilarity) <- books$isbn[1:1000]
 
 dissimilarity[15:20,15:20]
 ```
@@ -139,7 +140,7 @@ dissimilarity[15:20,15:20]
 user_id <- "User.1167"
 
 user_books <- ratings %>%
-  filter(user_id == user_id & isbn %in% books$isbn[1:10000]) %>%
+  filter(user_id == user_id & isbn %in% books$isbn[1:1000]) %>%
   arrange(desc(book_rating))
 
 head(user_books,10)
@@ -162,7 +163,7 @@ recomendar = function(selected_books, dissimilarity_matrix,
 
 
   recommendations = results %>%
-    pivot_longer(cols = c(-"recommended_book") , names_to = "readed_book", 
+    pivot_longer(cols = c(-"recommended_book") , names_to = "read_book", 
                  values_to = "dissimilarity") %>%
       left_join(selected_books, by = c("recommended_book" = "isbn"))%>%
     arrange(desc(dissimilarity)) %>%
@@ -175,14 +176,13 @@ recomendar = function(selected_books, dissimilarity_matrix,
     filter(weighted_score>0) %>%
     group_by(recommended_book) %>% slice(1) %>%
     top_n(n_recommendations, weighted_score)  %>%
-    left_join(books, by = c("recommended_book" = "ISBN"))
+    left_join(books, by = c("recommended_book" = "isbn"))
 
   return(recommendations)
 }
 
 recommendations <- recomendar(selected_books, dissimilarity, books)
 recommendations
-
 ```
 
 
